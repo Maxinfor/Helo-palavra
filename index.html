@@ -8,71 +8,69 @@
         .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 2px solid #334155; }
         .key { background: #1e293b; border: 2px solid #38bdf8; border-radius: 8px; padding: 10px; font-weight: bold; }
         .key:disabled { opacity: 0.3; }
-        #hangman-draw { font-family: monospace; font-size: 24px; color: #38bdf8; }
     </style>
 </head>
 <body class="p-6 flex flex-col items-center">
 
-    <h1 class="text-3xl font-black text-cyan-400 mb-6">JOGO DA FORCA</h1>
-
     <div class="glass p-8 rounded-3xl w-full max-w-md text-center">
-        <pre id="hangman-draw" class="mb-6"></pre>
+        <h1 class="text-2xl font-black text-cyan-400 mb-4">FORCA TEMPO</h1>
         
-        <p id="hint" class="text-lg mb-4 text-yellow-300 font-bold"></p>
+        <div id="timer-display" class="text-xl font-mono text-red-400 mb-4 font-bold">Tempo: --:--</div>
+        
+        <pre id="hangman-draw" class="mb-4 text-cyan-500"></pre>
+        <p id="hint" class="text-lg text-yellow-300 font-bold mb-2"></p>
         <div id="word-display" class="text-3xl tracking-[10px] mb-6 font-bold"></div>
 
-        <div class="mb-6">
-            <input type="text" id="full-answer" placeholder="Responder palavra..." class="bg-slate-800 p-2 rounded-lg border border-cyan-500 w-full mb-2">
-            <button onclick="checkFullWord()" class="w-full bg-green-600 py-2 rounded-lg font-bold hover:bg-green-500">RESPONDER PALAVRA</button>
-        </div>
-
-        <div id="keyboard" class="grid grid-cols-7 gap-2"></div>
+        <div id="keyboard" class="grid grid-cols-7 gap-1"></div>
     </div>
 
     <script>
-        const words = [
-            {w: "GATO", h: "Animal que faz miau"}, {w: "BOLA", h: "Brinquedo de chutar"},
-            {w: "CASA", h: "Onde a gente mora"}, {w: "LIVRO", h: "Tem muitas histórias"},
-            {w: "SOL", h: "Brilha durante o dia"}, {w: "LUA", h: "Brilha à noite"}
-            // Adicione mais até completar 50!
-        ];
-
+        const words = [{w: "GATO", h: "Animal que faz miau"}, {w: "BOLA", h: "Brinquedo de chutar"}];
         let selected = words[Math.floor(Math.random() * words.length)];
-        let guessed = [];
-        let errors = 0;
-        const stages = [
-            "  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========",
-            "  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========",
-            "  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========",
-            "  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========",
-            "  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========",
-            "  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========",
-            "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n========="
-        ];
+        let guessed = [], errors = 0, timeLeft = 180, timerInterval = null;
 
-        function render() {
-            document.getElementById('hint').innerText = "Dica: " + selected.h;
-            document.getElementById('hangman-draw').innerText = stages[errors];
-            
-            let display = selected.w.split('').map(l => guessed.includes(l) ? l : "_").join(' ');
-            document.getElementById('word-display').innerText = display;
+        function updateTimer() {
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                alert("O tempo acabou! A palavra era: " + selected.w);
+                location.reload();
+            }
+            let m = Math.floor(timeLeft / 60);
+            let s = timeLeft % 60;
+            document.getElementById('timer-display').innerText = `Tempo: ${m}:${s.toString().padStart(2, '0')}`;
+            timeLeft--;
         }
 
         function guess(l) {
             guessed.push(l);
-            if (!selected.w.includes(l)) errors++;
+            if (!selected.w.includes(l)) {
+                errors++;
+                // Inicia o timer após o segundo erro
+                if (errors === 2 && !timerInterval) {
+                    timerInterval = setInterval(updateTimer, 1000);
+                }
+            } else {
+                // Se acertar, reseta o tempo
+                timeLeft = 180;
+                document.getElementById('timer-display').innerText = "Tempo: 3:00";
+            }
+            
             document.getElementById('keyboard').querySelector(`[onclick="guess('${l}')"]`).disabled = true;
             render();
-            if (errors >= 6) alert("Fim de jogo! A palavra era: " + selected.w);
         }
 
-        function checkFullWord() {
-            const val = document.getElementById('full-answer').value.toUpperCase();
-            if (val === selected.w) alert("Parabéns, você acertou!");
-            else { errors++; render(); alert("Ops, errada!"); }
+        function render() {
+            document.getElementById('hint').innerText = "Dica: " + selected.h;
+            let display = selected.w.split('').map(l => guessed.includes(l) ? l : "_").join(' ');
+            document.getElementById('word-display').innerText = display;
+            
+            if (!display.includes('_')) {
+                clearInterval(timerInterval);
+                alert("Parabéns! Você venceu!");
+                location.reload();
+            }
         }
 
-        // Criar teclado
         const kb = document.getElementById('keyboard');
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(l => {
             kb.innerHTML += `<button class="key" onclick="guess('${l}')">${l}</button>`;
