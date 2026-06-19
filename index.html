@@ -2,63 +2,75 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #fce4ec; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Comic Sans MS', cursive; }
-        .barbie-card { background: #fff0f5; border: 4px solid #ec4899; border-radius: 40px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 0 20px #f472b6; }
-        .letter-box { width: 50px; height: 60px; border: 3px solid #ec4899; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #db2777; background: white; cursor: pointer; }
-        .key { background: #fbcfe8; padding: 10px; border-radius: 12px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; }
-        .key:active { transform: scale(0.95); background: #ec4899; color: white; }
+        body { background: #fce4ec; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Comic Sans MS', cursive; overflow: hidden; }
+        .barbie-card { background: #fff0f5; border: 4px solid #ec4899; border-radius: 30px; padding: 20px; width: 100%; height: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
+        .letter-box { width: 45px; height: 55px; border: 3px solid #ec4899; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; color: #db2777; background: white; }
+        .key { background: #fbcfe8; padding: 10px 5px; border-radius: 8px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; font-size: 14px; text-align: center; }
+        .key:active { transform: scale(0.9); background: #ec4899; color: white; }
+        .hidden-diamond { opacity: 0.2; }
     </style>
 </head>
 <body>
 
 <div class="barbie-card">
-    <h1 class="text-2xl font-black text-pink-600 text-center mb-4">FORÇA MÁGICA</h1>
+    <h1 class="text-2xl font-black text-pink-600 mb-2">FORÇA MÁGICA</h1>
     
     <!-- Contador de Diamantes -->
-    <div id="diamonds" class="flex justify-center gap-2 mb-6 text-2xl">💎💎💎💎💎</div>
+    <div id="diamonds" class="flex gap-1 mb-4 text-xl">💎💎💎💎💎</div>
     
-    <!-- Palavra sendo formada -->
-    <div id="word-display" class="flex justify-center gap-2 mb-6">
-        <!-- As caixinhas de letra geradas aqui -->
-    </div>
+    <!-- Dica -->
+    <button onclick="document.getElementById('hint-box').classList.toggle('hidden')" class="bg-yellow-400 text-white px-4 py-1 rounded-full text-sm font-bold mb-2 shadow-md">DICA ✨</button>
+    <div id="hint-box" class="hidden text-pink-700 font-bold mb-4 bg-pink-100 p-2 rounded-xl text-center">Dica: É rosa e brilha muito!</div>
+    
+    <!-- Palavra -->
+    <div id="word-display" class="flex justify-center gap-1 mb-6"></div>
 
-    <!-- Teclado Barbie -->
-    <div id="keyboard" class="grid grid-cols-7 gap-2"></div>
+    <!-- Teclado -->
+    <div id="keyboard" class="grid grid-cols-7 gap-1"></div>
 </div>
 
 <script>
-    const palavra = "GLITTER"; // Exemplo
-    let tentativa = ["G", "_", "_", "_", "_", "_"]; // Lógica de preenchimento
+    const palavra = "GLITTER";
+    let acertos = Array(palavra.length).fill("_");
+    let vidas = 5;
 
-    // Função para renderizar as caixas de letra
-    function renderWord() {
-        const container = document.getElementById('word-display');
-        container.innerHTML = '';
-        palavra.split('').forEach((letra, index) => {
+    function render() {
+        const wordContainer = document.getElementById('word-display');
+        wordContainer.innerHTML = '';
+        acertos.forEach((letra, i) => {
             const box = document.createElement('div');
             box.className = 'letter-box';
-            box.innerText = tentativa[index];
-            // Se clicar na caixa, ela limpa para corrigir
-            box.onclick = () => { tentativa[index] = "_"; renderWord(); };
-            container.appendChild(box);
+            box.innerText = letra;
+            box.onclick = () => { acertos[i] = "_"; render(); };
+            wordContainer.appendChild(box);
         });
+        document.getElementById('diamonds').innerText = '💎'.repeat(vidas);
     }
 
-    // Inicializar
-    renderWord();
-    
-    // Gerar teclado (simplificado)
-    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    function processarLetra(letra) {
+        if (palavra.includes(letra)) {
+            palavra.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
+        } else {
+            vidas--;
+        }
+        render();
+        if(vidas === 0) alert("Acabaram os diamantes! Tente de novo.");
+    }
+
+    // Teclado
     const kb = document.getElementById('keyboard');
-    letras.forEach(l => {
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(l => {
         const btn = document.createElement('div');
-        btn.className = 'key text-center';
+        btn.className = 'key';
         btn.innerText = l;
-        btn.onclick = () => alert("Adicionando letra: " + l);
+        btn.onclick = () => processarLetra(l);
         kb.appendChild(btn);
     });
+
+    render();
 </script>
 </body>
 </html>
