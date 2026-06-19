@@ -2,46 +2,63 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            height: 100vh; overflow: hidden; /* Garante que a tela não mexa */
-            display: flex; align-items: center; justify-content: center; font-family: 'Arial Rounded MT Bold', sans-serif;
-        }
-        .app-card { 
-            background: rgba(255, 255, 255, 0.95); width: 90%; max-width: 400px;
-            border-radius: 30px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            text-align: center; color: #4a5568;
-        }
-        .key { background: #edf2f7; border: 3px solid #cbd5e0; border-radius: 12px; padding: 10px; font-weight: bold; }
-        .key:active { transform: scale(0.9); }
-        #hangman-draw { font-size: 30px; color: #e53e3e; margin: 10px 0; }
+        body { background: #fce4ec; display: flex; justify-content: center; align-items: center; min-height: 100vh; font-family: 'Comic Sans MS', cursive; }
+        .barbie-card { background: #fff0f5; border: 4px solid #ec4899; border-radius: 40px; padding: 25px; width: 90%; max-width: 400px; box-shadow: 0 0 20px #f472b6; }
+        .letter-box { width: 50px; height: 60px; border: 3px solid #ec4899; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #db2777; background: white; cursor: pointer; }
+        .key { background: #fbcfe8; padding: 10px; border-radius: 12px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; }
+        .key:active { transform: scale(0.95); background: #ec4899; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="app-card">
-        <h1 class="text-2xl font-black text-purple-700 mb-2">FORCA MÁGICA</h1>
-        <div id="timer-display" class="font-bold text-red-500 mb-2">Tempo: 3:00</div>
-        
-        <pre id="hangman-draw"></pre>
-        <p id="hint" class="font-bold text-blue-600 mb-4 bg-blue-50 p-2 rounded-xl"></p>
-        <div id="word-display" class="text-3xl font-bold tracking-[8px] mb-4 text-purple-800"></div>
-
-        <div class="flex gap-2 mb-4">
-            <input type="text" id="full-answer" placeholder="Responder palavra..." class="flex-1 p-2 rounded-xl border-2 border-purple-200 text-center">
-            <button onclick="checkFullWord()" class="bg-green-500 text-white px-4 py-2 rounded-xl font-bold">OK</button>
-        </div>
-
-        <div id="keyboard" class="grid grid-cols-7 gap-1"></div>
+<div class="barbie-card">
+    <h1 class="text-2xl font-black text-pink-600 text-center mb-4">FORÇA MÁGICA</h1>
+    
+    <!-- Contador de Diamantes -->
+    <div id="diamonds" class="flex justify-center gap-2 mb-6 text-2xl">💎💎💎💎💎</div>
+    
+    <!-- Palavra sendo formada -->
+    <div id="word-display" class="flex justify-center gap-2 mb-6">
+        <!-- As caixinhas de letra geradas aqui -->
     </div>
 
-    <script>
-        // O restante da lógica permanece igual, mas agora o layout é estático
-        const stages = ["", "O", "O\n|", "O\n/|", "O\n/|\\", "O\n/|\\\n/", "O\n/|\\\n/ \\"];
-        // ... (resto do seu código JavaScript aqui)
-    </script>
+    <!-- Teclado Barbie -->
+    <div id="keyboard" class="grid grid-cols-7 gap-2"></div>
+</div>
+
+<script>
+    const palavra = "GLITTER"; // Exemplo
+    let tentativa = ["G", "_", "_", "_", "_", "_"]; // Lógica de preenchimento
+
+    // Função para renderizar as caixas de letra
+    function renderWord() {
+        const container = document.getElementById('word-display');
+        container.innerHTML = '';
+        palavra.split('').forEach((letra, index) => {
+            const box = document.createElement('div');
+            box.className = 'letter-box';
+            box.innerText = tentativa[index];
+            // Se clicar na caixa, ela limpa para corrigir
+            box.onclick = () => { tentativa[index] = "_"; renderWord(); };
+            container.appendChild(box);
+        });
+    }
+
+    // Inicializar
+    renderWord();
+    
+    // Gerar teclado (simplificado)
+    const letras = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    const kb = document.getElementById('keyboard');
+    letras.forEach(l => {
+        const btn = document.createElement('div');
+        btn.className = 'key text-center';
+        btn.innerText = l;
+        btn.onclick = () => alert("Adicionando letra: " + l);
+        kb.appendChild(btn);
+    });
+</script>
 </body>
 </html>
