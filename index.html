@@ -7,27 +7,56 @@
     <style>
         body { background: #fce4ec; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Comic Sans MS', cursive; overflow: hidden; }
         .barbie-card { background: #fff0f5; border: 4px solid #ec4899; border-radius: 30px; padding: 20px; width: 100%; height: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
-        .letter-box { width: 45px; height: 55px; border: 3px solid #ec4899; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: bold; color: #db2777; background: white; }
-        .key { background: #fbcfe8; padding: 10px 5px; border-radius: 8px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; font-size: 14px; text-align: center; }
+        .letter-box { width: 40px; height: 50px; border: 3px solid #ec4899; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #db2777; background: white; margin: 2px; }
+        .key { background: #fbcfe8; padding: 8px 4px; border-radius: 8px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; font-size: 13px; text-align: center; }
         .key:active { transform: scale(0.9); background: #ec4899; color: white; }
     </style>
 </head>
 <body>
 
 <div class="barbie-card">
-    <h1 class="text-2xl font-black text-pink-600 mb-2">FORÇA MÁGICA</h1>
-    <div id="diamonds" class="flex gap-1 mb-4 text-xl">💎💎💎💎💎</div>
+    <h1 class="text-xl font-black text-pink-600 mb-2">FORÇA MÁGICA</h1>
+    <div id="diamonds" class="flex gap-1 mb-4 text-xl"></div>
     
-    <div id="game-area" class="w-full flex flex-col items-center">
-        <div id="word-display" class="flex justify-center gap-1 mb-6"></div>
-        <div id="keyboard" class="grid grid-cols-7 gap-1"></div>
-    </div>
+    <div id="word-display" class="flex justify-center mb-6 flex-wrap"></div>
+    <div id="keyboard" class="grid grid-cols-7 gap-1 w-full"></div>
 </div>
 
 <script>
-    const palavra = "GLITTER";
-    let acertos = Array(palavra.length).fill("_");
+    // Lista expandida com palavras apropriadas para o 3º ano
+    const bancoDePalavras = [
+        "AMIZADE", "ESCOLA", "CADERNO", "ESTOJO", "CANETA", "BORRACHA", "LIVRO", "LEITURA", "HISTORIA", "MATEMATICA",
+        "CIENCIA", "ESTUDO", "APRENDER", "BRINCAR", "BONECA", "CASTELO", "ESTRELA", "CORACAO", "FLORES", "JARDIM",
+        "PARQUE", "PASSEIO", "VIAGEM", "FAMILIA", "PAPAI", "MAMAE", "IRMAO", "AMIGOS", "FELICIDADE", "ALEGRIA",
+        "SONHO", "MAGIA", "DANCAR", "CANTAR", "MUSICA", "PINTURA", "DESENHO", "CRIANCA", "MENINA", "BONECO",
+        "MUNDO", "PLANETA", "NATUREZA", "ANIMAIS", "CACHORRO", "GATINHO", "PASSARO", "COELHO", "BORBOLETA", "ABELHA",
+        "SOL", "LUA", "NUVEM", "CHUVA", "VENTO", "CALOR", "FRIO", "VERAO", "INVERNO", "PRIMAVERA",
+        "FRUTA", "BANANA", "MACA", "LARANJA", "UVA", "MORANGO", "MELANCIA", "ABACAXI", "DOCE", "BOLO",
+        "CHOCOLATE", "SORVETE", "PIPOCA", "LANCHE", "ALMOCO", "JANTAR", "AGUA", "SUCO", "LEITE", "PITA",
+        "CASA", "QUARTO", "SALA", "COZINHA", "BANHEIRO", "JARDIM", "GARAGEM", "PORTA", "JANELA", "TELHADO",
+        "BICICLETA", "PATINETE", "BOLA", "PIPA", "BONECA", "URSINHO", "QUEBRA", "PUZZLE", "JOGO", "VIDEO",
+        "COMPUTADOR", "TABLET", "CELULAR", "TELEFONE", "INTERNET", "FOTO", "CAMERA", "VIZINHO", "BAIRRO", "CIDADE",
+        "BRASIL", "MUNDO", "MAPA", "BANDEIRA", "CORES", "AZUL", "ROSA", "AMARELO", "VERDE", "VERMELHO",
+        "BRANCO", "PRETO", "CINZA", "ROXO", "LARANJA", "BEGE", "DOURADO", "PRATA", "FELIZ", "TRISTE",
+        "BRAVO", "CALMO", "MEDO", "CORAGEM", "FORCA", "PODER", "LUTA", "VITORIA", "GRANDE", "PEQUENO",
+        "ALTO", "BAIXO", "RAPIDO", "DEVAGAR", "CEDO", "TARDE", "NOITE", "DIA", "AMANHA", "HOJE",
+        "ONTEM", "SEMANA", "MES", "ANO", "TEMPO", "HORA", "MINUTO", "SEGUNDO", "VIDA", "MUNDO",
+        "POVO", "GENTE", "PESSOA", "CORPO", "Rosto", "CABELO", "OLHOS", "NARIZ", "BOCA", "MAO",
+        "PE", "PERNA", "BRACO", "CABECA", "DENTE", "UNHA", "COSTAS", "BARRIGA", "PEITO", "OMBROS",
+        "JOELHO", "TORNOZELO", "PESCOCO", "ORELHA", "LINGUA", "QUEIXO", "TESTA", "SOBRANCELHA", "CILIOS", "BARBA"
+    ];
+
+    let atual = {};
+    let acertos = [];
     let vidas = 5;
+
+    function carregarJogo() {
+        vidas = 5;
+        // Seleção aleatória
+        atual = { palavra: bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)] };
+        acertos = Array(atual.palavra.length).fill("_");
+        render();
+    }
 
     function render() {
         const wordContainer = document.getElementById('word-display');
@@ -45,28 +74,27 @@
     function processarLetra(letra) {
         if (vidas <= 0) return;
 
-        if (palavra.includes(letra)) {
-            palavra.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
+        if (atual.palavra.includes(letra)) {
+            atual.palavra.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
         } else {
             vidas--;
         }
         
         render();
 
-        // Verifica vitória
         if (!acertos.includes("_")) {
             setTimeout(() => {
-                alert("✨ Parabéns! Você é uma estrela! ✨");
-                // Aqui você pode resetar o jogo ou carregar uma nova palavra
-                location.reload(); 
-            }, 200);
+                alert("✨ Parabéns! Você acertou: " + atual.palavra);
+                carregarJogo();
+            }, 100);
         } else if(vidas === 0) {
-            alert("Acabaram os diamantes! Tente de novo.");
-            location.reload();
+            setTimeout(() => {
+                alert("Acabaram os diamantes! A palavra era: " + atual.palavra);
+                carregarJogo();
+            }, 100);
         }
     }
 
-    // Teclado
     const kb = document.getElementById('keyboard');
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(l => {
         const btn = document.createElement('div');
@@ -76,7 +104,7 @@
         kb.appendChild(btn);
     });
 
-    render();
+    carregarJogo();
 </script>
 </body>
 </html>
