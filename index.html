@@ -4,66 +4,81 @@
     <meta charset="UTF-8">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #0f172a; color: white; font-family: 'Comic Sans MS', cursive, sans-serif; }
-        .game-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 2px solid #334155; }
-        .key { background: #1e293b; border: 2px solid #38bdf8; border-radius: 10px; padding: 10px; cursor: pointer; }
-        .key:hover { background: #38bdf8; }
-        .letter-slot { border-bottom: 3px solid #38bdf8; width: 40px; font-size: 24px; text-align: center; }
+        body { background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 2px solid #334155; }
+        .key { background: #1e293b; border: 2px solid #38bdf8; border-radius: 8px; padding: 10px; font-weight: bold; }
+        .key:disabled { opacity: 0.3; }
+        #hangman-draw { font-family: monospace; font-size: 24px; color: #38bdf8; }
     </style>
 </head>
-<body class="p-4 flex flex-col items-center">
+<body class="p-6 flex flex-col items-center">
 
-    <h1 class="text-3xl font-black text-cyan-400 mb-2">JOGO DA FORCA</h1>
-    <div id="game-container" class="game-card p-8 rounded-3xl w-full max-w-lg text-center">
-        <p id="hint" class="text-lg mb-6 text-yellow-400"></p>
-        <div id="word-display" class="flex justify-center gap-3 mb-8"></div>
+    <h1 class="text-3xl font-black text-cyan-400 mb-6">JOGO DA FORCA</h1>
+
+    <div class="glass p-8 rounded-3xl w-full max-w-md text-center">
+        <pre id="hangman-draw" class="mb-6"></pre>
+        
+        <p id="hint" class="text-lg mb-4 text-yellow-300 font-bold"></p>
+        <div id="word-display" class="text-3xl tracking-[10px] mb-6 font-bold"></div>
+
+        <div class="mb-6">
+            <input type="text" id="full-answer" placeholder="Responder palavra..." class="bg-slate-800 p-2 rounded-lg border border-cyan-500 w-full mb-2">
+            <button onclick="checkFullWord()" class="w-full bg-green-600 py-2 rounded-lg font-bold hover:bg-green-500">RESPONDER PALAVRA</button>
+        </div>
+
         <div id="keyboard" class="grid grid-cols-7 gap-2"></div>
-        <p class="mt-6 text-sm text-slate-400">Erros: <span id="errors">0</span>/6</p>
     </div>
 
     <script>
         const words = [
             {w: "GATO", h: "Animal que faz miau"}, {w: "BOLA", h: "Brinquedo de chutar"},
             {w: "CASA", h: "Onde a gente mora"}, {w: "LIVRO", h: "Tem muitas histórias"},
-            {w: "SOL", h: "Brilha durante o dia"}, {w: "LUA", h: "Brilha à noite"},
-            {w: "DADO", h: "Tem números e lados"}, {w: "PATO", h: "Ave que nada na lagoa"},
-            {w: "MESA", h: "Onde comemos"}, {w: "RUA", h: "Onde passam os carros"},
-            // ... adicione as outras 40 aqui ...
+            {w: "SOL", h: "Brilha durante o dia"}, {w: "LUA", h: "Brilha à noite"}
+            // Adicione mais até completar 50!
         ];
 
         let selected = words[Math.floor(Math.random() * words.length)];
         let guessed = [];
         let errors = 0;
+        const stages = [
+            "  +---+\n  |   |\n      |\n      |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n      |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n  |   |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|   |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n      |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n /    |\n      |\n=========",
+            "  +---+\n  |   |\n  O   |\n /|\\  |\n / \\  |\n      |\n========="
+        ];
 
-        function init() {
+        function render() {
             document.getElementById('hint').innerText = "Dica: " + selected.h;
-            renderWord();
-            renderKeyboard();
-        }
-
-        function renderWord() {
+            document.getElementById('hangman-draw').innerText = stages[errors];
+            
             let display = selected.w.split('').map(l => guessed.includes(l) ? l : "_").join(' ');
-            document.getElementById('word-display').innerHTML = display;
-        }
-
-        function renderKeyboard() {
-            const kb = document.getElementById('keyboard');
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(l => {
-                kb.innerHTML += `<button class="key" onclick="guess('${l}')">${l}</button>`;
-            });
+            document.getElementById('word-display').innerText = display;
         }
 
         function guess(l) {
-            if (guessed.includes(l)) return;
             guessed.push(l);
             if (!selected.w.includes(l)) errors++;
-            document.getElementById('errors').innerText = errors;
-            renderWord();
-            if (errors >= 6) alert("Game Over! A palavra era: " + selected.w);
-            if (!document.getElementById('word-display').innerText.includes('_')) alert("Parabéns!");
+            document.getElementById('keyboard').querySelector(`[onclick="guess('${l}')"]`).disabled = true;
+            render();
+            if (errors >= 6) alert("Fim de jogo! A palavra era: " + selected.w);
         }
 
-        init();
+        function checkFullWord() {
+            const val = document.getElementById('full-answer').value.toUpperCase();
+            if (val === selected.w) alert("Parabéns, você acertou!");
+            else { errors++; render(); alert("Ops, errada!"); }
+        }
+
+        // Criar teclado
+        const kb = document.getElementById('keyboard');
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').forEach(l => {
+            kb.innerHTML += `<button class="key" onclick="guess('${l}')">${l}</button>`;
+        });
+
+        render();
     </script>
 </body>
 </html>
