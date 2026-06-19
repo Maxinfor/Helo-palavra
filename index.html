@@ -16,34 +16,22 @@
 
 <div class="barbie-card">
     <h1 class="text-xl font-black text-pink-600 mb-2">FORÇA MÁGICA</h1>
-    <div id="diamonds" class="flex gap-1 mb-4 text-xl"></div>
+    <div id="diamonds" class="flex gap-1 mb-2 text-xl"></div>
+    
+    <button onclick="mostrarDica()" class="bg-yellow-400 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md mb-2 border-2 border-white">DICA ✨</button>
+    <div id="hint-text" class="text-pink-700 font-bold mb-4 h-6 text-center text-sm"></div>
     
     <div id="word-display" class="flex justify-center mb-6 flex-wrap"></div>
     <div id="keyboard" class="grid grid-cols-7 gap-1 w-full"></div>
 </div>
 
 <script>
-    // Lista expandida com palavras apropriadas para o 3º ano
     const bancoDePalavras = [
-        "AMIZADE", "ESCOLA", "CADERNO", "ESTOJO", "CANETA", "BORRACHA", "LIVRO", "LEITURA", "HISTORIA", "MATEMATICA",
-        "CIENCIA", "ESTUDO", "APRENDER", "BRINCAR", "BONECA", "CASTELO", "ESTRELA", "CORACAO", "FLORES", "JARDIM",
-        "PARQUE", "PASSEIO", "VIAGEM", "FAMILIA", "PAPAI", "MAMAE", "IRMAO", "AMIGOS", "FELICIDADE", "ALEGRIA",
-        "SONHO", "MAGIA", "DANCAR", "CANTAR", "MUSICA", "PINTURA", "DESENHO", "CRIANCA", "MENINA", "BONECO",
-        "MUNDO", "PLANETA", "NATUREZA", "ANIMAIS", "CACHORRO", "GATINHO", "PASSARO", "COELHO", "BORBOLETA", "ABELHA",
-        "SOL", "LUA", "NUVEM", "CHUVA", "VENTO", "CALOR", "FRIO", "VERAO", "INVERNO", "PRIMAVERA",
-        "FRUTA", "BANANA", "MACA", "LARANJA", "UVA", "MORANGO", "MELANCIA", "ABACAXI", "DOCE", "BOLO",
-        "CHOCOLATE", "SORVETE", "PIPOCA", "LANCHE", "ALMOCO", "JANTAR", "AGUA", "SUCO", "LEITE", "PITA",
-        "CASA", "QUARTO", "SALA", "COZINHA", "BANHEIRO", "JARDIM", "GARAGEM", "PORTA", "JANELA", "TELHADO",
-        "BICICLETA", "PATINETE", "BOLA", "PIPA", "BONECA", "URSINHO", "QUEBRA", "PUZZLE", "JOGO", "VIDEO",
-        "COMPUTADOR", "TABLET", "CELULAR", "TELEFONE", "INTERNET", "FOTO", "CAMERA", "VIZINHO", "BAIRRO", "CIDADE",
-        "BRASIL", "MUNDO", "MAPA", "BANDEIRA", "CORES", "AZUL", "ROSA", "AMARELO", "VERDE", "VERMELHO",
-        "BRANCO", "PRETO", "CINZA", "ROXO", "LARANJA", "BEGE", "DOURADO", "PRATA", "FELIZ", "TRISTE",
-        "BRAVO", "CALMO", "MEDO", "CORAGEM", "FORCA", "PODER", "LUTA", "VITORIA", "GRANDE", "PEQUENO",
-        "ALTO", "BAIXO", "RAPIDO", "DEVAGAR", "CEDO", "TARDE", "NOITE", "DIA", "AMANHA", "HOJE",
-        "ONTEM", "SEMANA", "MES", "ANO", "TEMPO", "HORA", "MINUTO", "SEGUNDO", "VIDA", "MUNDO",
-        "POVO", "GENTE", "PESSOA", "CORPO", "Rosto", "CABELO", "OLHOS", "NARIZ", "BOCA", "MAO",
-        "PE", "PERNA", "BRACO", "CABECA", "DENTE", "UNHA", "COSTAS", "BARRIGA", "PEITO", "OMBROS",
-        "JOELHO", "TORNOZELO", "PESCOCO", "ORELHA", "LINGUA", "QUEIXO", "TESTA", "SOBRANCELHA", "CILIOS", "BARBA"
+        {p: "BONECA", d: "Um brinquedo que muitas meninas adoram."},
+        {p: "CASTELO", d: "Onde as princesas moram."},
+        {p: "ESTRELA", d: "Brilha no céu à noite."},
+        {p: "ESCOLA", d: "Lugar onde aprendemos coisas novas."},
+        {p: "GLITTER", d: "Pó que brilha muito!"}
     ];
 
     let atual = {};
@@ -52,10 +40,14 @@
 
     function carregarJogo() {
         vidas = 5;
-        // Seleção aleatória
-        atual = { palavra: bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)] };
-        acertos = Array(atual.palavra.length).fill("_");
+        document.getElementById('hint-text').innerText = "";
+        atual = bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)];
+        acertos = Array(atual.p.length).fill("_");
         render();
+    }
+
+    function mostrarDica() {
+        document.getElementById('hint-text').innerText = "Dica: " + atual.d;
     }
 
     function render() {
@@ -74,8 +66,8 @@
     function processarLetra(letra) {
         if (vidas <= 0) return;
 
-        if (atual.palavra.includes(letra)) {
-            atual.palavra.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
+        if (atual.p.includes(letra)) {
+            atual.p.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
         } else {
             vidas--;
         }
@@ -84,12 +76,12 @@
 
         if (!acertos.includes("_")) {
             setTimeout(() => {
-                alert("✨ Parabéns! Você acertou: " + atual.palavra);
+                alert("✨ Parabéns! Você acertou: " + atual.p);
                 carregarJogo();
             }, 100);
         } else if(vidas === 0) {
             setTimeout(() => {
-                alert("Acabaram os diamantes! A palavra era: " + atual.palavra);
+                alert("Acabaram os diamantes! A palavra era: " + atual.p);
                 carregarJogo();
             }, 100);
         }
