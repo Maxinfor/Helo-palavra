@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #fce4ec; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Comic Sans MS', cursive; overflow: hidden; }
+        /* Fonte limpa e legível, sem ser cursiva */
+        body { background: #fce4ec; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Arial', sans-serif; overflow: hidden; }
+        
         .barbie-card { background: #fff0f5; border: 4px solid #ec4899; border-radius: 30px; padding: 20px; width: 100%; height: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
-        .letter-box { width: 40px; height: 50px; border: 3px solid #ec4899; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #db2777; background: white; margin: 2px; }
-        .key { background: #fbcfe8; padding: 8px 4px; border-radius: 8px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; font-size: 13px; text-align: center; }
+        
+        .letter-box { width: 35px; height: 45px; border: 3px solid #ec4899; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #db2777; background: white; margin: 2px; }
+        
+        .key { background: #fbcfe8; padding: 6px 2px; border-radius: 6px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; font-size: 14px; text-align: center; }
+        
         .key:active { transform: scale(0.9); background: #ec4899; color: white; }
     </style>
 </head>
@@ -19,34 +24,105 @@
     <div id="diamonds" class="flex gap-1 mb-2 text-xl"></div>
     
     <button onclick="mostrarDica()" class="bg-yellow-400 text-white px-6 py-1 rounded-full font-bold text-sm shadow-md mb-2 border-2 border-white">DICA ✨</button>
-    <div id="hint-text" class="text-pink-700 font-bold mb-4 h-10 text-center text-sm px-2"></div>
+    <div id="hint-text" class="text-pink-700 font-bold mb-4 h-10 text-center text-sm px-2 overflow-y-auto"></div>
     
     <div id="word-display" class="flex justify-center mb-6 flex-wrap"></div>
     <div id="keyboard" class="grid grid-cols-7 gap-1 w-full"></div>
 </div>
 
 <script>
+    // As 200 palavras continuam configuradas aqui (mantive a lista que enviamos anteriormente)
     const bancoDePalavras = [
-        {p: "BONECA", d: "Um brinquedo em forma de pessoa."},
-        {p: "CASTELO", d: "Moradia luxuosa de uma princesa."},
-        {p: "ESTRELA", d: "Ponto brilhante que vemos no céu à noite."},
-        {p: "ESCOLA", d: "Local onde vamos para aprender."},
-        {p: "GLITTER", d: "Pó brilhante usado para decorar."},
-        {p: "AMIZADE", d: "O sentimento de ser amigo de alguém."},
-        {p: "BORRACHA", d: "Usada para apagar o que está no papel."},
-        {p: "CANETA", d: "Objeto usado para escrever de azul ou preto."},
-        {p: "CADERNO", d: "Onde fazemos nossas tarefas escolares."},
-        {p: "LIVRO", d: "Tem muitas páginas e histórias dentro."},
-        {p: "CORACAO", d: "Símbolo do amor."},
-        {p: "JARDIM", d: "Lugar cheio de flores e plantas."},
-        {p: "BICICLETA", d: "Veículo de duas rodas que usamos para passear."},
-        {p: "SORVETE", d: "Doce gelado que comemos no calor."},
-        {p: "CHOCOLATE", d: "Um doce muito gostoso feito de cacau."},
-        {p: "PIPOCA", d: "Comida crocante que comemos no cinema."},
-        {p: "CACHORRO", d: "O melhor amigo do homem."},
-        {p: "GATINHO", d: "Animal que faz miau."},
-        {p: "BORBOLETA", d: "Inseto colorido que voa com asas lindas."},
-        {p: "MACA", d: "Fruta vermelha e muito saudável."},
-        {p: "BANANA", d: "Fruta amarela que os macacos amam."},
-        {p: "ESTOJO", d: "Onde guardamos lápis e canetas."},
-        {p: "PARQUE", d: "Lugar com balanços e escorregadores."},
+        {p: "ABACAXI", d: "Fruta com coroa espinhosa."}, {p: "ABELHA", d: "Inseto que produz mel."}, {p: "ABRIGO", d: "Lugar de proteção."}, {p: "ACADEMIA", d: "Lugar para exercícios."}, {p: "ACORDE", d: "Som harmônico."}, {p: "AEROPORTO", d: "Onde aviões pousam."}, {p: "AFETO", d: "Sentimento de carinho."}, {p: "AGASALHO", d: "Roupa contra o frio."}, {p: "AGENDA", d: "Onde anotamos compromissos."}, {p: "AGUA", d: "Líquido essencial."},
+        {p: "AJUDA", d: "Ação de auxiliar."}, {p: "ALEGRIA", d: "Sentimento de felicidade."}, {p: "ALFABETO", d: "Conjunto de letras."}, {p: "ALMOCO", d: "Refeição do meio-dia."}, {p: "ALUNO", d: "Quem estuda."}, {p: "AMARELO", d: "Cor do sol."}, {p: "AMIZADE", d: "Sentimento de amigos."}, {p: "AMOR", d: "Sentimento forte."}, {p: "ANIMAL", d: "Ser vivo."}, {p: "ANIVERSARIO", d: "Data do nascimento."},
+        {p: "APRENDER", d: "Adquirir conhecimento."}, {p: "ARCOIRIS", d: "Fenômeno colorido."}, {p: "AREIA", d: "Pequenas pedras da praia."}, {p: "ARVORE", d: "Planta grande."}, {p: "ASAS", d: "Para voar."}, {p: "ASTRONAUTA", d: "Viajante espacial."}, {p: "ATLETA", d: "Pratica esportes."}, {p: "AZUL", d: "Cor do céu."}, {p: "BAILARINA", d: "Dança balé."}, {p: "BALANCO", d: "Brinquedo de vai e vem."},
+        {p: "BANANA", d: "Fruta amarela."}, {p: "BANDEIRA", d: "Símbolo de um país."}, {p: "BANHEIRO", d: "Local de higiene."}, {p: "BARCO", d: "Transporte na água."}, {p: "BATATA", d: "Tubérculo saboroso."}, {p: "BEBIDA", d: "Líquido potável."}, {p: "BEIJO", d: "Carinho labial."}, {p: "BICICLETA", d: "Duas rodas."}, {p: "BOLACHA", d: "Doce crocante."}, {p: "BOLA", d: "Redonda para esportes."},
+        {p: "BONECA", d: "Brinquedo de menina."}, {p: "BONECO", d: "Brinquedo de menino."}, {p: "BORBOLETA", d: "Inseto colorido."}, {p: "BORRACHA", d: "Apaga o erro."}, {p: "BOTAO", d: "Fecha a roupa."}, {p: "BRILHO", d: "Reflete luz."}, {p: "BRINCADEIRA", d: "Para se divertir."}, {p: "BRINQUEDO", d: "Objeto de diversão."}, {p: "CABELO", d: "Pelos da cabeça."}, {p: "CABECA", d: "Parte superior."},
+        {p: "CACHORRO", d: "Late muito."}, {p: "CADERNO", d: "Para escrever."}, {p: "CAFE", d: "Bebida quente."}, {p: "CALOR", d: "Temperatura alta."}, {p: "CAMISA", d: "Roupa de vestir."}, {p: "CAMPINHO", d: "Para jogar."}, {p: "CANETA", d: "Escreve com tinta."}, {p: "CANTAR", d: "Fazer música com a voz."}, {p: "CARINHO", d: "Ato amoroso."}, {p: "CARTA", d: "Mensagem em papel."},
+        {p: "CASAMENTO", d: "União formal."}, {p: "CASTELO", d: "Moradia real."}, {p: "CEBOLA", d: "Faz chorar."}, {p: "CELULAR", d: "Comunicação portátil."}, {p: "CENOURA", d: "Laranja e crocante."}, {p: "CHUVA", d: "Água do céu."}, {p: "CIDADE", d: "Muitas casas e gente."}, {p: "CIENCIA", d: "Estudo do mundo."}, {p: "CINEMA", d: "Filmes na tela grande."}, {p: "COELHO", d: "Orelhudo."},
+        {p: "COLA", d: "Gruda papéis."}, {p: "CORACAO", d: "Símbolo do amor."}, {p: "CORES", d: "Variedade visual."}, {p: "CORRIDA", d: "Esporte rápido."}, {p: "COZINHA", d: "Lugar de comida."}, {p: "CRIANCA", d: "Pessoa jovem."}, {p: "DANCAR", d: "Mover ao som."}, {p: "DENTE", d: "Para mastigar."}, {p: "DESENHO", d: "Representação artística."}, {p: "DIA", d: "Tempo com sol."},
+        {p: "DIAMANTE", d: "Pedra brilhante."}, {p: "DICA", d: "Ajuda extra."}, {p: "DOCE", d: "Guloseima."}, {p: "DOMINGO", d: "Dia de folga."}, {p: "DORMIR", d: "Repouso."}, {p: "ESCOLA", d: "Local de estudo."}, {p: "ESTOJO", d: "Guarda canetas."}, {p: "ESTRELA", d: "Luz noturna."}, {p: "ESTUDO", d: "Aprender algo."}, {p: "FAMILIA", d: "Pessoas queridas."},
+        {p: "FELICIDADE", d: "Ser feliz."}, {p: "FESTA", d: "Celebração."}, {p: "FILME", d: "História em vídeo."}, {p: "FLORES", d: "Plantas perfumadas."}, {p: "FOGO", d: "Produz luz e calor."}, {p: "FOTO", d: "Imagem fixa."}, {p: "FRUTA", d: "Comida natural."}, {p: "FUTEBOL", d: "Esporte com bola."}, {p: "GATINHO", d: "Faz miau."}, {p: "GELO", d: "Água fria sólida."},
+        {p: "GENTE", d: "Grupo de pessoas."}, {p: "GLITTER", d: "Pó que brilha."}, {p: "GOSTO", d: "Sabor."}, {p: "HISTORIA", d: "Narrativa."}, {p: "HOJE", d: "Este dia."}, {p: "HORA", d: "Tempo."}, {p: "IGREJA", d: "Local sagrado."}, {p: "INVERNO", d: "Época fria."}, {p: "IRMAO", d: "Parentesco próximo."}, {p: "JARDIM", d: "Flores e plantas."},
+        {p: "JOGO", d: "Brincadeira de regras."}, {p: "JORNAL", d: "Notícias impressas."}, {p: "LARANJA", d: "Cor cítrica."}, {p: "LEITE", d: "Bebida branca."}, {p: "LEITURA", d: "Ação de ler."}, {p: "LIVRO", d: "Histórias escritas."}, {p: "LUA", d: "Luz noturna."}, {p: "LUZ", d: "Iluminação."}, {p: "MACACAO", d: "Roupa única."}, {p: "MACA", d: "Fruta clássica."},
+        {p: "MAGIA", d: "Algo surpreendente."}, {p: "MAMAE", d: "Quem cuida."}, {p: "MAPA", d: "Localização."}, {p: "MATEMATICA", d: "Números."}, {p: "MEDO", d: "Assustador."}, {p: "MELANCIA", d: "Fruta suculenta."}, {p: "MENINA", d: "Sexo feminino."}, {p: "MESA", d: "Objeto de apoio."}, {p: "MINUTO", d: "Tempo curto."}, {p: "MUSICA", d: "Som melódico."},
+        {p: "NATUREZA", d: "Vida ao ar livre."}, {p: "NARIZ", d: "Para cheirar."}, {p: "NOITE", d: "Escuridão."}, {p: "NOME", d: "Identificação."}, {p: "NUVEM", d: "Vapor no céu."}, {p: "OLHOS", d: "Para ver."}, {p: "OMBROS", d: "Articulação."}, {p: "ONIBUS", d: "Transporte comum."}, {p: "PANTUFA", d: "Conforto pés."}, {p: "PAPAI", d: "Pai."},
+        {p: "PARQUE", d: "Lazer ao ar livre."}, {p: "PASSEIO", d: "Pequena viagem."}, {p: "PEIXE", d: "Vive na água."}, {p: "PERNA", d: "Para andar."}, {p: "PIANO", d: "Teclas musicais."}, {p: "PIPOCA", d: "Milho estourado."}, {p: "PINTURA", d: "Arte tinta."}, {p: "PIPA", d: "Voa no céu."}, {p: "PLANETA", d: "Corpo celeste."}, {p: "PORTA", d: "Entrada."},
+        {p: "PRIMAVERA", d: "Estação das flores."}, {p: "PUZZLE", d: "Quebra-cabeça."}, {p: "QUEIJO", d: "Derivado leite."}, {p: "QUENTE", d: "Caloroso."}, {p: "RAPIDO", d: "Veloz."}, {p: "RELOGIO", d: "Marca hora."}, {p: "ROSA", d: "Flor cor rosa."}, {p: "ROSTO", d: "Face."}, {p: "SALA", d: "Cômodo social."}, {p: "SAPATO", d: "Calçado."},
+        {p: "SEMANA", d: "7 dias."}, {p: "SOL", d: "Estrela central."}, {p: "SONHO", d: "Imaginação."}, {p: "SORVETE", d: "Doce gelado."}, {p: "SUCO", d: "Bebida fruta."}, {p: "TABLET", d: "Computador tela."}, {p: "TELA", d: "Visor."}, {p: "TELEFONE", d: "Falar longe."}, {p: "TEMPO", d: "Cronologia."}, {p: "TESTA", d: "Acima olhos."},
+        {p: "TRISTE", d: "Pouco feliz."}, {p: "UVA", d: "Cachos."}, {p: "URSINHO", d: "De pelúcia."}, {p: "VELA", d: "Ilumina."}, {p: "VENTO", d: "Ar."}, {p: "VERAO", d: "Época calor."}, {p: "VIAGEM", d: "Ir longe."}, {p: "VIDA", d: "Existência."}, {p: "VIZINHO", d: "Mora perto."}, {p: "ZOO", d: "Animais diversos."},
+        {p: "ZEBRA", d: "Animal listrado."}, {p: "XICARA", d: "Para café/chá."}, {p: "TAMBOR", d: "Instrumento batida."}, {p: "VASO", d: "Para flores."}, {p: "TAPETE", d: "Decoração chão."}, {p: "LAPISEIRA", d: "Tipo lápis."}, {p: "MOCHILA", d: "Para livros."}, {p: "APONTADOR", d: "Para lápis."}, {p: "CADEIRA", d: "Para sentar."}, {p: "JANELA", d: "Abertura luz."},
+        {p: "CAMA", d: "Para dormir."}, {p: "LATA", d: "Recipiente."}, {p: "LUVA", d: "Para mão."}, {p: "MEIA", d: "Pé."}, {p: "BONECAS", d: "Muitas bonecas."}, {p: "PRINCESA", d: "Realeza."}, {p: "COROA", d: "Símbolo real."}, {p: "VARINHA", d: "Mágica."}, {p: "FADA", d: "Ser mágico."}, {p: "DRAGAO", d: "Ser fantástico."},
+        {p: "ESCRITA", d: "Ação de escrever."}, {p: "LEMBRANCA", d: "Memória."}, {p: "CORRER", d: "Movimento rápido."}, {p: "PULAR", d: "Saltar."}, {p: "GIRAR", d: "Rodar."}, {p: "SALTAR", d: "Pular alto."}, {p: "VEM", d: "Chegar."}, {p: "VAI", d: "Ir."}, {p: "DADO", d: "Jogo de sorte."}, {p: "DAMA", d: "Jogo tabuleiro."},
+        {p: "TELA", d: "Visor eletrônico."}, {p: "MOUSE", d: "Acessório PC."}, {p: "TECLADO", d: "Botões."}, {p: "FONE", d: "Som ouvido."}, {p: "RODA", d: "Círculo movimento."}, {p: "AUTO", d: "Carro."}, {p: "MOTO", d: "Duas rodas motor."}, {p: "TREM", d: "Sobre trilhos."}, {p: "NAVIO", d: "Grande barco."}, {p: "AVIAO", d: "Voa alto."},
+        {p: "CASA", d: "Lugar de morar."}, {p: "TETO", d: "Cobre a casa."}, {p: "CHAO", d: "Onde pisa."}, {p: "MURO", d: "Cerca de tijolos."}, {p: "PISO", d: "Revestimento."}, {p: "PORTAO", d: "Entrada externa."}, {p: "QUARTO", d: "De dormir."}, {p: "SALAO", d: "Espaço grande."}, {p: "FORNO", d: "Aquece comida."}, {p: "FOGAO", d: "Para cozinhar."},
+        {p: "PANELA", d: "Prepara almoço."}, {p: "PRATO", d: "Onde come."}, {p: "GARFO", d: "Para comer."}, {p: "FACA", d: "Corta."}, {p: "COLHER", d: "Para sopa."}, {p: "COPO", d: "Para beber."}, {p: "TACA", d: "Copa fina."}, {p: "MESA", d: "Móvel."}, {p: "CADEIRA", d: "Móvel."}, {p: "SOFA", d: "Conforto sala."},
+        {p: "BANCO", d: "Sentar."}, {p: "DORMITORIO", d: "Quarto."}, {p: "CORTINA", d: "Decora janela."}, {p: "TAPETE", d: "Chão."}, {p: "QUADRO", d: "Na parede."}, {p: "LAMPADA", d: "Luz."}, {p: "PILHA", d: "Energia."}, {p: "BATERIA", d: "Carga."}, {p: "FIO", d: "Condutor."}, {p: "TOMADA", d: "Conector."}
+    ];
+
+    let atual = {};
+    let acertos = [];
+    let vidas = 5;
+
+    function carregarJogo() {
+        vidas = 5;
+        document.getElementById('hint-text').innerText = "";
+        atual = bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)];
+        acertos = Array(atual.p.length).fill("_");
+        render();
+    }
+
+    function mostrarDica() {
+        document.getElementById('hint-text').innerText = "Dica: " + atual.d;
+    }
+
+    function render() {
+        const wordContainer = document.getElementById('word-display');
+        wordContainer.innerHTML = '';
+        acertos.forEach((letra, i) => {
+            const box = document.createElement('div');
+            box.className = 'letter-box';
+            box.innerText = letra;
+            box.onclick = () => { acertos[i] = "_"; render(); };
+            wordContainer.appendChild(box);
+        });
+        document.getElementById('diamonds').innerText = '💎'.repeat(vidas);
+    }
+
+    function processarLetra(letra) {
+        if (vidas <= 0) return;
+
+        if (atual.p.includes(letra)) {
+            atual.p.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
+        } else {
+            vidas--;
+        }
+        
+        render();
+
+        if (!acertos.includes("_")) {
+            setTimeout(() => {
+                alert("✨ Parabéns! Você acertou: " + atual.p);
+                carregarJogo();
+            }, 100);
+        } else if(vidas === 0) {
+            setTimeout(() => {
+                alert("Acabaram os diamantes! A palavra era: " + atual.p);
+                carregarJogo();
+            }, 100);
+        }
+    }
+
+    const kb = document.getElementById('keyboard');
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(l => {
+        const btn = document.createElement('div');
+        btn.className = 'key';
+        btn.innerText = l;
+        btn.onclick = () => processarLetra(l);
+        kb.appendChild(btn);
+    });
+
+    carregarJogo();
+</script>
+</body>
+</html>
