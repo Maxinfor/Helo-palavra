@@ -18,8 +18,8 @@
     <h1 class="text-xl font-black text-pink-600 mb-2">FORÇA MÁGICA</h1>
     <div id="diamonds" class="flex gap-1 mb-2 text-xl"></div>
     
-    <button onclick="mostrarDica()" class="bg-yellow-400 text-white px-6 py-2 rounded-full font-bold text-sm shadow-md mb-2 border-2 border-white">DICA ✨</button>
-    <div id="hint-text" class="text-pink-700 font-bold mb-4 h-6 text-center text-sm"></div>
+    <button onclick="mostrarDica()" class="bg-yellow-400 text-white px-6 py-1 rounded-full font-bold text-sm shadow-md mb-2 border-2 border-white">DICA ✨</button>
+    <div id="hint-text" class="text-pink-700 font-bold mb-4 h-10 text-center text-sm px-2"></div>
     
     <div id="word-display" class="flex justify-center mb-6 flex-wrap"></div>
     <div id="keyboard" class="grid grid-cols-7 gap-1 w-full"></div>
@@ -27,76 +27,26 @@
 
 <script>
     const bancoDePalavras = [
-        {p: "BONECA", d: "Um brinquedo que muitas meninas adoram."},
-        {p: "CASTELO", d: "Onde as princesas moram."},
-        {p: "ESTRELA", d: "Brilha no céu à noite."},
-        {p: "ESCOLA", d: "Lugar onde aprendemos coisas novas."},
-        {p: "GLITTER", d: "Pó que brilha muito!"}
-    ];
-
-    let atual = {};
-    let acertos = [];
-    let vidas = 5;
-
-    function carregarJogo() {
-        vidas = 5;
-        document.getElementById('hint-text').innerText = "";
-        atual = bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)];
-        acertos = Array(atual.p.length).fill("_");
-        render();
-    }
-
-    function mostrarDica() {
-        document.getElementById('hint-text').innerText = "Dica: " + atual.d;
-    }
-
-    function render() {
-        const wordContainer = document.getElementById('word-display');
-        wordContainer.innerHTML = '';
-        acertos.forEach((letra, i) => {
-            const box = document.createElement('div');
-            box.className = 'letter-box';
-            box.innerText = letra;
-            box.onclick = () => { acertos[i] = "_"; render(); };
-            wordContainer.appendChild(box);
-        });
-        document.getElementById('diamonds').innerText = '💎'.repeat(vidas);
-    }
-
-    function processarLetra(letra) {
-        if (vidas <= 0) return;
-
-        if (atual.p.includes(letra)) {
-            atual.p.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
-        } else {
-            vidas--;
-        }
-        
-        render();
-
-        if (!acertos.includes("_")) {
-            setTimeout(() => {
-                alert("✨ Parabéns! Você acertou: " + atual.p);
-                carregarJogo();
-            }, 100);
-        } else if(vidas === 0) {
-            setTimeout(() => {
-                alert("Acabaram os diamantes! A palavra era: " + atual.p);
-                carregarJogo();
-            }, 100);
-        }
-    }
-
-    const kb = document.getElementById('keyboard');
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(l => {
-        const btn = document.createElement('div');
-        btn.className = 'key';
-        btn.innerText = l;
-        btn.onclick = () => processarLetra(l);
-        kb.appendChild(btn);
-    });
-
-    carregarJogo();
-</script>
-</body>
-</html>
+        {p: "BONECA", d: "Um brinquedo em forma de pessoa."},
+        {p: "CASTELO", d: "Moradia luxuosa de uma princesa."},
+        {p: "ESTRELA", d: "Ponto brilhante que vemos no céu à noite."},
+        {p: "ESCOLA", d: "Local onde vamos para aprender."},
+        {p: "GLITTER", d: "Pó brilhante usado para decorar."},
+        {p: "AMIZADE", d: "O sentimento de ser amigo de alguém."},
+        {p: "BORRACHA", d: "Usada para apagar o que está no papel."},
+        {p: "CANETA", d: "Objeto usado para escrever de azul ou preto."},
+        {p: "CADERNO", d: "Onde fazemos nossas tarefas escolares."},
+        {p: "LIVRO", d: "Tem muitas páginas e histórias dentro."},
+        {p: "CORACAO", d: "Símbolo do amor."},
+        {p: "JARDIM", d: "Lugar cheio de flores e plantas."},
+        {p: "BICICLETA", d: "Veículo de duas rodas que usamos para passear."},
+        {p: "SORVETE", d: "Doce gelado que comemos no calor."},
+        {p: "CHOCOLATE", d: "Um doce muito gostoso feito de cacau."},
+        {p: "PIPOCA", d: "Comida crocante que comemos no cinema."},
+        {p: "CACHORRO", d: "O melhor amigo do homem."},
+        {p: "GATINHO", d: "Animal que faz miau."},
+        {p: "BORBOLETA", d: "Inseto colorido que voa com asas lindas."},
+        {p: "MACA", d: "Fruta vermelha e muito saudável."},
+        {p: "BANANA", d: "Fruta amarela que os macacos amam."},
+        {p: "ESTOJO", d: "Onde guardamos lápis e canetas."},
+        {p: "PARQUE", d: "Lugar com balanços e escorregadores."},
