@@ -1,62 +1,120 @@
-// Variáveis globais para os novos recursos
-let pontos = 0;
-let indicePremio = 0;
-const itensBeleza = ["💄 Batom", "💅 Esmalte", "🧴 Creme", "🎀 Laço", "✨ Glitter", "🌸 Perfume", "🪞 Espelho", "🖌️ Pincel"];
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background: #fce4ec; height: 100vh; display: flex; align-items: center; justify-content: center; font-family: 'Arial', sans-serif; overflow: hidden; }
+        .barbie-card { background: #fff0f5; border: 4px solid #ec4899; border-radius: 30px; padding: 20px; width: 100%; height: 100%; max-width: 450px; display: flex; flex-direction: column; align-items: center; }
+        .letter-box { width: 35px; height: 45px; border: 3px solid #ec4899; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: bold; color: #db2777; background: white; margin: 2px; }
+        .key { background: #fbcfe8; padding: 6px 2px; border-radius: 6px; font-weight: bold; color: #9d174d; cursor: pointer; border: 2px solid #ec4899; font-size: 14px; text-align: center; }
+        .key:active { transform: scale(0.9); background: #ec4899; color: white; }
+    </style>
+</head>
+<body>
 
-function carregarJogo() {
-    vidas = 5;
-    document.getElementById('hint-text').innerText = "";
-    atual = bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)];
-    acertos = Array(atual.p.length).fill("_");
-    render();
-}
-
-function mostrarDica() {
-    document.getElementById('hint-text').innerText = "Dica: " + atual.d;
-}
-
-function render() {
-    const wordContainer = document.getElementById('word-display');
-    wordContainer.innerHTML = '';
-    acertos.forEach((letra, i) => {
-        const box = document.createElement('div');
-        box.className = 'letter-box';
-        box.innerText = letra;
-        wordContainer.appendChild(box);
-    });
-    document.getElementById('diamonds').innerText = '💎'.repeat(vidas);
-}
-
-function processarLetra(letra) {
-    if (vidas <= 0) return;
-
-    if (atual.p.includes(letra)) {
-        atual.p.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
-    } else {
-        vidas--;
-    }
+<div class="barbie-card">
+    <h1 class="text-xl font-black text-pink-600 mb-1">FORÇA MÁGICA</h1>
     
-    render();
+    <!-- Novo Contador e Exibidor de Prêmio -->
+    <div class="flex justify-between w-full px-4 mb-2 text-sm">
+        <div class="text-pink-600 font-bold">💎 Pontos: <span id="pontos-contador">0</span></div>
+        <div id="premio-exibido" class="text-pink-800 font-bold italic truncate ml-2"></div>
+    </div>
 
-    if (!acertos.includes("_")) {
-        setTimeout(() => {
-            // Lógica do kit e pontos acrescentada
-            pontos += 10;
-            const premio = itensBeleza[indicePremio % itensBeleza.length];
-            
-            document.getElementById('pontos-contador').innerText = pontos;
-            document.getElementById('premio-exibido').innerText = "🎁 " + premio;
-            
-            alert("✨ Parabéns! Você ganhou: " + premio);
-            
-            indicePremio++;
-            carregarJogo();
-        }, 100);
-    } else if(vidas === 0) {
-        setTimeout(() => {
-            alert("Acabaram os diamantes! A palavra era: " + atual.p);
-            carregarJogo();
-        }, 100);
+    <div id="diamonds" class="flex gap-1 mb-2 text-xl"></div>
+    
+    <button onclick="mostrarDica()" class="bg-yellow-400 text-white px-6 py-1 rounded-full font-bold text-sm shadow-md mb-2 border-2 border-white">DICA ✨</button>
+    <div id="hint-text" class="text-pink-700 font-bold mb-4 h-10 text-center text-sm px-2"></div>
+    
+    <div id="word-display" class="flex justify-center mb-6 flex-wrap"></div>
+    <div id="keyboard" class="grid grid-cols-7 gap-1 w-full"></div>
+</div>
+
+<script>
+    const bancoDePalavras = [
+        {p: "ABACAXI", d: "Fruta com coroa espinhosa."}, {p: "ABELHA", d: "Inseto que produz mel."}, {p: "AMIZADE", d: "Sentimento de amigos."},
+        {p: "BORBOLETA", d: "Inseto colorido."}, {p: "BRILHO", d: "Reflete luz."}, {p: "CASTELO", d: "Moradia real."},
+        {p: "DIAMANTE", d: "Pedra brilhante."}, {p: "ESTRELA", d: "Luz noturna."}, {p: "FESTA", d: "Celebração."},
+        {p: "GLITTER", d: "Pó que brilha."}, {p: "MAGIA", d: "Algo surpreendente."}, {p: "PRINCESA", d: "Realeza."},
+        {p: "VARINHA", d: "Mágica."}, {p: "FADA", d: "Ser mágico."}, {p: "COROA", d: "Símbolo real."}
+    ];
+
+    const itensBeleza = ["💄 Batom", "💅 Esmalte", "🧴 Creme", "🎀 Laço", "✨ Glitter", "🌸 Perfume", "🪞 Espelho", "🖌️ Pincel"];
+    
+    let atual = {};
+    let acertos = [];
+    let vidas = 5;
+    let pontos = 0;
+    let indicePremio = 0;
+
+    function carregarJogo() {
+        vidas = 5;
+        document.getElementById('hint-text').innerText = "";
+        atual = bancoDePalavras[Math.floor(Math.random() * bancoDePalavras.length)];
+        acertos = Array(atual.p.length).fill("_");
+        render();
     }
-}
 
+    function mostrarDica() {
+        document.getElementById('hint-text').innerText = "Dica: " + atual.d;
+    }
+
+    function render() {
+        const wordContainer = document.getElementById('word-display');
+        wordContainer.innerHTML = '';
+        acertos.forEach((letra) => {
+            const box = document.createElement('div');
+            box.className = 'letter-box';
+            box.innerText = letra;
+            wordContainer.appendChild(box);
+        });
+        document.getElementById('diamonds').innerText = '💎'.repeat(vidas);
+    }
+
+    function processarLetra(letra) {
+        if (vidas <= 0) return;
+
+        if (atual.p.includes(letra)) {
+            atual.p.split('').forEach((l, i) => { if(l === letra) acertos[i] = letra; });
+        } else {
+            vidas--;
+        }
+        
+        render();
+
+        if (!acertos.includes("_")) {
+            setTimeout(() => {
+                // Atualização dos pontos e kit de beleza
+                pontos += 10;
+                const premio = itensBeleza[indicePremio % itensBeleza.length];
+                document.getElementById('pontos-contador').innerText = pontos;
+                document.getElementById('premio-exibido').innerText = "🎁 " + premio;
+                
+                alert("✨ Parabéns! Você ganhou: " + premio);
+                
+                indicePremio++;
+                carregarJogo();
+            }, 100);
+        } else if(vidas === 0) {
+            setTimeout(() => {
+                alert("Acabaram os diamantes! A palavra era: " + atual.p);
+                carregarJogo();
+            }, 100);
+        }
+    }
+
+    const kb = document.getElementById('keyboard');
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("").forEach(l => {
+        const btn = document.createElement('div');
+        btn.className = 'key';
+        btn.innerText = l;
+        btn.onclick = () => processarLetra(l);
+        kb.appendChild(btn);
+    });
+
+    carregarJogo();
+</script>
+</body>
+</html>
